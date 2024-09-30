@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\NoteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +31,5 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::apiResource('tags',TagController::class);
+Route::apiResource('notes',NoteController::class);
 
