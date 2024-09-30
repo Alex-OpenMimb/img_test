@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TagRequest;
 use App\Http\Resources\TagResource;
 use App\Traits\ApiResponser;
 use App\Models\Tag;
@@ -31,55 +32,30 @@ class TagController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created resource in storage.
      */
-    public function create()
+    public function store(TagRequest $request)
     {
         try {
-            $tags = Tag::get();
-            return $this->successResponse( TagResource::collection($tags) );
+            $tag = Tag::create( $request->all() );
+            return $this->successResponse( new TagResource( $tag ),'Tag created successfully' );
         }catch ( \Exception $e ){
             return $this->errorResponse($e->getMessage(), 409);
         }
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(TagRequest $request, Tag $tag)
     {
-        //
+        try {
+            $tag->update( $request->all() );
+            return $this->successResponse( new TagResource( $tag ),'Tag updated successfully' );
+        }catch ( \Exception $e ){
+            return $this->errorResponse($e->getMessage(), 409);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+
 }

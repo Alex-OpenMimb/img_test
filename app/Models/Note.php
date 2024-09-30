@@ -14,8 +14,10 @@ class Note extends Model
     protected $fillable = [
         'title',
         'description',
+        'image',
         'creation_date',
+        'expiration_date',
         'user_id',
         'tag_id',
-    ];
+            ];
 }

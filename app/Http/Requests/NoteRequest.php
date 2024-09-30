@@ -3,14 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator as ValidationValidator;
-use App\Traits\ApiResponser;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class TagRequest extends FormRequest
+class NoteRequest extends FormRequest
 {
-    use ApiResponser;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -30,21 +26,19 @@ class TagRequest extends FormRequest
             case 'POST':
                 return [
                     'name'              => ['bail','required','string', 'max:60', 'min:4', Rule::unique('tags')],
-
+                    'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
+                    'expiration_date'   => 'bail|required|date|after_or_equal:today',
                 ];
                 break;
+            case 'PATCH':
             case 'PUT':
                 return [
                     'name'              => ['bail','required','string', 'max:60', 'min:4', Rule::unique('tags')->ignore( request('tag') )],
+                    'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
+                    'expiration_date'   => 'bail|required|date|after_or_equal:today',
                 ];
                 break;
 
         }
-    }
-
-
-    public function failedValidation(ValidationValidator $validator) {
-        $message = $validator->errors()->first();
-        throw new HttpResponseException($this->showMessage($message, 500, false));
     }
 }

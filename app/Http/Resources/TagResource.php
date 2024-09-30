@@ -17,8 +17,6 @@ class TagResource extends JsonResource
         return [
             'id'                    => $this->id,
             'name'                  => $this->name,
-            'image'                 => $this->image,
-            'expiration_date'       => $this->expiration_date,
             'created_at'            => date_format($this->created_at, 'Y-m-d, h:m'),
             'updated_at'            => date_format($this->updated_at, 'Y-m-d, h:m'),
         ];

@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('tags', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->string('image')->nullable();
-            $table->date('expiration_date');
 
             $table->timestamps();
         });
@@ -25,7 +23,9 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('title');
             $table->string('description');
-            $table->date('creation_date');
+            $table->string('image')->nullable();
+            $table->date('creation_date')->nullable();
+            $table->date('expiration_date')->nullable();
 
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('tag_id')->constrained('tags');

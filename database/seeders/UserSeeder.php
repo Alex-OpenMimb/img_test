@@ -2,20 +2,21 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tag;
-use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class TagSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Tag::create([
-            'name'=>'Deporte',
+        User::create([
+            'name'=>'Alex Hurtado',
+            'email'=> 'alex@email.com',
+            'password' => 'Admin911$01',
         ]);
     }
 }
