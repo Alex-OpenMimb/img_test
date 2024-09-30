@@ -21,8 +21,8 @@ class NoteResource extends JsonResource
             'image'                 => $this->image,
             'creation_date'         => $this->creation_date,
             'expiration_date'       => $this->expiration_date,
-            'user_id'               => $this->user_id,
-            'tag_id'                => $this->tag_id,
+            'user'                  => $this->user->name,
+            'tag'                   => $this->tag->name,
             'created_at'            => date_format($this->created_at, 'Y-m-d, h:m'),
             'updated_at'            => date_format($this->updated_at, 'Y-m-d, h:m'),
         ];

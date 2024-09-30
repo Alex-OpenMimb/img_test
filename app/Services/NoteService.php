@@ -10,11 +10,11 @@ class NoteService
      public static function storeImage( $note,$image )
     {
         $path     = 'image/note';
-        $title    = Str::slug( $note->title,'-' );
-        $nameFile = $title.'.png';
+        $nameFile = $note->id.'.png';
 
         Storage::disk('public')->putFileAs( $path, $image, $nameFile );
 
         return $path .'/'. $nameFile;
     }
+
 }

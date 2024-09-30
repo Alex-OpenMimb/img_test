@@ -16,6 +16,13 @@ class Tag extends Model
         'name',
     ];
 
+    //Relationhpis
+    public function notes()
+    {
+        return $this->hasMany( Note::class );
+    }
+
+    //Getters
     protected function name(): Attribute
     {
         return Attribute::make(

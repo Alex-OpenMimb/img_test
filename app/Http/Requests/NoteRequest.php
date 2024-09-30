@@ -34,7 +34,6 @@ class NoteRequest extends FormRequest
                     'creation_date'     => 'bail|required|date|after_or_equal:today',
                     'expiration_date'   => [
                         'bail',
-                        'required',
                         'date',
                         function ($attribute, $value, $fail) {
                             $creationDate = $this->input('creation_date');
@@ -47,6 +46,29 @@ class NoteRequest extends FormRequest
                     'tag_id'=> 'required|exists:tags,id'
                 ];
                 break;
+
+            case 'PUT':
+                return [
+                    'title'             => ['required','string', 'max:60', 'min:4', Rule::unique('notes')->ignore( request('note') )],
+                    'description'       => 'bail|required|min:10',
+                    'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
+                    'creation_date'     => 'bail|required|date|after_or_equal:today',
+                    'expiration_date'   => [
+                        'bail',
+                        'date',
+                        function ($attribute, $value, $fail) {
+                            $creationDate = $this->input('creation_date');
+                            if (strtotime($value) <= strtotime($creationDate)) {
+                                $fail('The expiration date must be after the creation date.');
+                            }
+                        },
+                    ],
+                    'user_id'=> 'required|exists:users,id',
+                    'tag_id'=> 'required|exists:tags,id'
+                ];
+                break;
+            default:
+                return [];
 
 
         }

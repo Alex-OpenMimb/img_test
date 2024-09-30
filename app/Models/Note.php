@@ -19,10 +19,20 @@ class Note extends Model
         'creation_date',
         'expiration_date',
         'user_id',
-        'tag_id',
-            ];
+        'tag_id',];
 
 
+    //Relationships
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function tag()
+    {
+        return $this->belongsTo( Tag::class );
+    }
     protected function title(): Attribute
     {
         return Attribute::make(
