@@ -3,24 +3,21 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
             <ul class=" navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-between " style="width: 100%">
                 <div class="d-flex me-auto " style="">
-                    <li class="nav-item">
-                        <a exact-active-class="active" to="/home" class="nav-link" aria-current="page">Etiquetas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a exact-active-class="active" to="/home" class="nav-link" aria-current="page">Notas</a>
+                    <li class="nav-item" v-if="(token !== 0)">
+                        <router-link exact-active-class="active" to="/note" class="nav-link"  aria-current="page">Notas</router-link>
                     </li>
                 </div>
 
-                <div class="d-flex " style=""> <!-- Alineado a la derecha -->
-                    <li class="nav-item">
-                        <a exact-active-class="active" to="/login" class="nav-link">Register</a>
+                <div class="d-flex " style="">
+                    <li class="nav-item" v-if="(token === 0)">
+                        <router-link exact-active-class="active" to="/register" class="nav-link">Registrar</router-link>
                     </li>
-                    <li class="nav-item">
-                        <a exact-active-class="active" to="/login" class="nav-link">Login</a>
+                    <li class="nav-item" v-if="(token === 0)" >
+                        <router-link exact-active-class="active" to="/login" class="nav-link">Login</router-link>
                     </li>
 
-                    <div>
-                        <button type="button" class="btn btn-danger mt-2">Logout</button>
+                    <div v-if="(token !== 0)">
+                        <button type="button" class="btn btn-danger mt-2" @click="logout">Logout</button>
                     </div>
                 </div>
             </ul>
@@ -35,13 +32,26 @@
 </template>
 
 <script>
-
+import { useRouter } from "vue-router"
+import { useStore } from 'vuex'
 export default {
-    // `setup` is a special hook dedicated for the Composition API.
     setup() {
 
+        const router = useRouter()
+        const store = useStore();
+        const token = store.getters.token;
 
-        // expose the ref to the template
+        function logout(){
+            store.dispatch('removeToken');
+            router.push({name:'login'})
+        }
+
+
+        return {
+            logout,
+            token
+
+        }
 
     }
 }
