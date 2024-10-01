@@ -34,12 +34,13 @@
 <script>
 import { useRouter } from "vue-router"
 import { useStore } from 'vuex'
+import { computed } from 'vue'
 export default {
     setup() {
 
         const router = useRouter()
         const store = useStore();
-        const token = store.getters.token;
+        const token = computed(() => store.getters.token);
 
         function logout(){
             store.dispatch('removeToken');
