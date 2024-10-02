@@ -14,8 +14,12 @@ class TagSeeder extends Seeder
      */
     public function run(): void
     {
-        Tag::create([
-            'name'=>'Deporte',
-        ]);
+      foreach (Tag::TAGS as $tag  ){
+          Tag::create([
+              'name'=> $tag,
+          ]);
+      }
+
+
     }
 }

@@ -6,6 +6,7 @@ const store = createStore({
         token : localStorage.getItem('token') || '',
         tags : [],
         notes: [],
+        error: '',
     },
     mutations:{
 
@@ -20,6 +21,7 @@ const store = createStore({
         }
     },
     actions:{
+
         setToken(context,payload){
             localStorage.setItem('token',payload)
             context.commit('UPDATE_TOKEN',payload)
@@ -55,12 +57,26 @@ const store = createStore({
 
                 console.error("Error adding task:", error);
             });
+        },
+        storeNote( {commit,state},data ){
+            const token = state.token;
+            axios.post(`/api/notes`,data,{
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }).then( response =>{
+                let note = response.data
+                console.log(note)
+            }).catch(error => {
+
+                console.error("Error adding task:", error);
+            });
         }
     },
     getters:{
         token: state => state.token,
         tags:  state => state.tags,
-        notes:  state => state.notes
+        notes: state => state.notes
 
     }
 

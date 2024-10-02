@@ -16,6 +16,8 @@ class Tag extends Model
         'name',
     ];
 
+    const TAGS = ['Deporte','Politica','Clima','Espectaculo','Otro'];
+
     //Relationhpis
     public function notes()
     {

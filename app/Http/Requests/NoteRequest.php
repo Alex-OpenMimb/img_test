@@ -29,10 +29,11 @@ class NoteRequest extends FormRequest
             case 'POST':
                 return [
                     'title'             => ['bail','required','string', 'max:60', 'min:4', Rule::unique('notes')],
-                    'description'       => 'bail|required|min:10',
-                    'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
+                    'description'       => 'bail|required|min:5',
+                    //'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
                     'expiration_date'   => [
                         'bail',
+                        'nullable',
                         'date','after:today'],
                     'tag_id'=> 'required|exists:tags,id'
                 ];
@@ -45,6 +46,7 @@ class NoteRequest extends FormRequest
                     'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
                     'expiration_date'   => [
                         'bail',
+                        'nullable',
                         'date','after:today'],
                     'tag_id'=> 'required|exists:tags,id'
                 ];

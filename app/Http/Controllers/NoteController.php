@@ -40,7 +40,7 @@ class NoteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(NoteRequest $request)
+    public function store(Request $request)
     {
         try {
             $data = self::buildData( $request );
