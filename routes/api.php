@@ -31,5 +31,6 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::apiResource('tags',TagController::class);
-Route::apiResource('notes',NoteController::class);
+Route::apiResource('notes',NoteController::class)->except(['update']);
+Route::post('notes/{note}',[NoteController::class,'update']);
 

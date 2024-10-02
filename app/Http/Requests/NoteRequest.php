@@ -26,23 +26,11 @@ class NoteRequest extends FormRequest
     public function rules(): array
     {
         switch ($this->method()) {
+
             case 'POST':
                 return [
-                    'title'             => ['bail','required','string', 'max:60', 'min:4', Rule::unique('notes')],
-                    'description'       => 'bail|required|min:5',
-                    //'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
-                    'expiration_date'   => [
-                        'bail',
-                        'nullable',
-                        'date','after:today'],
-                    'tag_id'=> 'required|exists:tags,id'
-                ];
-                break;
-
-            case 'PUT':
-                return [
                     'title'             => ['required','string', 'max:60', 'min:4', Rule::unique('notes')->ignore( request('note') )],
-                    'description'       => 'bail|required|min:10',
+                    'description'       => 'bail|required|min:4',
                     'image'             => 'bail|nullable|image|mimes:jpeg,png,jpg|dimensions:max_width=2000,max_height=2000',
                     'expiration_date'   => [
                         'bail',
@@ -59,7 +47,7 @@ class NoteRequest extends FormRequest
     }
 
     public function failedValidation(ValidationValidator $validator) {
-        $message = $validator->errors()->first();
+        $message = $validator->errors()->all();
         throw new HttpResponseException($this->showMessage($message, 500, false));
     }
 

@@ -40,7 +40,7 @@ class NoteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(NoteRequest $request)
     {
         try {
             $data = self::buildData( $request );
@@ -61,7 +61,7 @@ class NoteController extends Controller
      */
     public function update(NoteRequest $request, Note $note)
     {
-
+         //return  response()->json(['data'=>$request->all()]);
         try {
 
             $note->update( [
@@ -71,8 +71,10 @@ class NoteController extends Controller
                 'tag_id'          => $request['tag_id'],
             ] );
             if(  $request['image']  ){
-                if( Storage::exists($note->image) ) Storage::disk('public')->delete( $note->image);
-               self::storeImage( $note, $request );
+                if( $note->image ){
+                    if( Storage::disk('public')->exists($note->image) ) Storage::disk('public')->delete( $note->image);
+                }
+                self::storeImage( $note, $request );
             }
           return  $this->successResponse( new NoteResource( $note ), 'Note updated successfully' );
         }catch (\Exception $e){
@@ -87,7 +89,11 @@ class NoteController extends Controller
     {
         try{
             $note->delete();
-            return $this->showMessage('Note destroyed successfully');
+            if( $note->image ){
+                if( Storage::disk('public')->exists($note->image) ) Storage::disk('public')->delete( $note->image);
+            }
+
+           return $this->showMessage('Note destroyed successfully');
         }catch (\Exception $e){
             return $this->errorResponse($e->getMessage(), 409);
         }
