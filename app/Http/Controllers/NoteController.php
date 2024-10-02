@@ -61,9 +61,7 @@ class NoteController extends Controller
      */
     public function update(NoteRequest $request, Note $note)
     {
-         //return  response()->json(['data'=>$request->all()]);
         try {
-
             $note->update( [
                 'title'           => $request['title'],
                 'description'     => $request['description'],
@@ -71,6 +69,7 @@ class NoteController extends Controller
                 'tag_id'          => $request['tag_id'],
             ] );
             if(  $request['image']  ){
+                //Delete the image if it exists to update it
                 if( $note->image ){
                     if( Storage::disk('public')->exists($note->image) ) Storage::disk('public')->delete( $note->image);
                 }
@@ -89,17 +88,19 @@ class NoteController extends Controller
     {
         try{
             $note->delete();
+            //Delete the image if it exists to update it
             if( $note->image ){
                 if( Storage::disk('public')->exists($note->image) ) Storage::disk('public')->delete( $note->image);
             }
-
            return $this->showMessage('Note destroyed successfully');
         }catch (\Exception $e){
             return $this->errorResponse($e->getMessage(), 409);
         }
     }
 
-
+    /**
+     * Build data to store
+     */
     protected function buildData( $request )
     {
         $user_id       = auth()->user()->id;
@@ -114,6 +115,9 @@ class NoteController extends Controller
         ];
     }
 
+    /**
+     * Store image
+     */
     protected function storeImage(  $note, $request )
     {
         $image_path = NoteService::storeImage($note, $request['image']);

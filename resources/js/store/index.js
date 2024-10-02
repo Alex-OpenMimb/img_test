@@ -6,7 +6,7 @@ const store = createStore({
         token : localStorage.getItem('token') || '',
         tags : [],
         notes: [],
-        error: false,
+        error: null,
     },
     mutations:{
 
@@ -62,44 +62,49 @@ const store = createStore({
                 console.error("Error:", error);
             });
         },
-        storeNote( {commit,state},data ){
-
+        storeNote({ commit, state }, formData) {
             const token = state.token
-            axios.post(`/api/notes`,data,{
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }).then( response =>{
-                let message = response.data.message
-                console.log( response.data )
-                if (!response.data.response) {
-                    commit('SET_ERROR', message);
-                }else{
-                    commit('SET_ERROR', false);
-                }
-            }).catch(error => {
-                console.error(error)
-            });
+            return new Promise((resolve, reject) => {
+                axios.post('/api/notes', formData,{
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }).then(response => {
+                    let message = response.data.message
+                    if( !response.data.response ) {
+                        commit('SET_ERROR',message);
+                    }else{
+                        commit('SET_ERROR',null);
+                        resolve(response)
+                    }
+
+                    })
+                    .catch(error => {
+                        reject(error)
+                    })
+            })
         },
-        updateNote( {commit,state},{id,data} ){
+        updateNote( {commit,state},{note,data} ){
             const token = state.token
-            axios.post(`/api/notes/${id}`,data,{
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }).then( response =>{
-                let note = response.data
-                console.log(note)
-                let message = response.data.message
-                if (!response.data.response) {
-                    commit('SET_ERROR', message);
-                }else{
-                    commit('SET_ERROR', false);
-                }
-            }).catch(error => {
+            return new Promise((resolve, reject) => {
+                axios.post(`/api/notes/${note}`, data,{
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }).then(response => {
+                    let message = response.data.message
+                    if( !response.data.response ) {
+                        commit('SET_ERROR',message);
+                    }else{
+                        commit('SET_ERROR',null);
+                        resolve(response)
+                    }
 
-                console.error("Error:", error)
-            });
+                }).catch(error => {
+                        reject(error)
+                    })
+            })
+
         },
         deleteNete({commit,state},id){
             const token = state.token

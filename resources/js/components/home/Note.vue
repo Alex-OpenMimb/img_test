@@ -153,12 +153,12 @@
 
                             <div class="form-group my-4">
                                 <label>Imagen</label>
-                                <input  @change="handleImageUpload"  class="form-control" type="file">
+                                <input  @change="handleImageUploadUpdate"  class="form-control" type="file">
                             </div>
 
                             <div class="form-group d-flex flex-column my-4">
                                 <label>Categoría</label>
-                                <select v-model="selectedNote.tag_id"   class="form-control" >
+                                <select v-model="selectedNote.tag_id" class="form-control" >
                                     <option v-for="(tag, index) in tags" :key="index" :value="tag.id">
                                         {{ tag.name }}
                                     </option>
@@ -186,7 +186,7 @@
 </template>
 
 <script>
-import { computed, ref, onMounted, reactive } from 'vue'
+import { computed, ref, onMounted, reactive, watch } from 'vue'
 import { useStore  } from 'vuex'
 export default {
 
@@ -208,7 +208,7 @@ export default {
             description: '',
             expiration_date: '',
             tag_id: '',
-            image: null
+            tag:'',
         })
 
         onMounted(() => {
@@ -219,7 +219,13 @@ export default {
         const handleImageUpload = (event) => {
             form.image = event.target.files[0]
 
-        };
+
+        }
+
+        const handleImageUploadUpdate = (event)=>{
+            selectedNote.value.image = event.target.files[0]
+
+        }
 
         const clearInput = ()=>{
             form.title = ''
@@ -227,7 +233,7 @@ export default {
             form.expiration_date = ''
             form.tag_id = ''
             form.image = null
-            //store.dispatch('clearError')
+
         }
 
         const createNote = () => {
@@ -259,17 +265,18 @@ export default {
 
         const setNote = (note) =>{
             selectedNote.value = {...note}
-            console.log(selectedNote.value.title )
+            if(note.image) selectedNote.value.image = null
+
         }
 
-        const updateNote = (id)=>{
+        const updateNote = (note)=>{
             const formData = new FormData()
             formData.append('title', selectedNote.value.title)
             formData.append('description', selectedNote.value.description)
             if( selectedNote.value.expiration_date  ) formData.append('expiration_date', selectedNote.value.expiration_date)
             formData.append('tag_id', selectedNote.value.tag_id)
-            if (form.image) formData.append('image', form.image);
-            store.dispatch('updateNote',  { id, data:formData }).then(() => {
+            if (selectedNote.value.image) formData.append('image', selectedNote.value.image);
+            store.dispatch('updateNote',  { note, data:formData }).then(() => {
                     store.dispatch('fetchNote')
                     $('#edit-note').modal('hide')
 
@@ -314,7 +321,8 @@ export default {
             updateNote,
             handleImageUpload,
             deleteNote,
-            clearInput
+            clearInput,
+            handleImageUploadUpdate
 
         }
     }
