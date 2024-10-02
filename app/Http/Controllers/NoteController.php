@@ -8,6 +8,7 @@ use App\Http\Resources\TagResource;
 use App\Models\Note;
 use App\Services\NoteService;
 use App\Traits\ApiResponser;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -62,8 +63,13 @@ class NoteController extends Controller
     {
 
         try {
-            $data = self::buildData( $request );
-            $note->update( $data );
+
+            $note->update( [
+                'title'           => $request['title'],
+                'description'     => $request['description'],
+                'expiration_date' => $request['expiration_date'],
+                'tag_id'          => $request['tag_id'],
+            ] );
             if(  $request['image']  ){
                 if( Storage::exists($note->image) ) Storage::disk('public')->delete( $note->image);
                self::storeImage( $note, $request );
@@ -90,12 +96,14 @@ class NoteController extends Controller
 
     protected function buildData( $request )
     {
+        $user_id       = auth()->user()->id;
+        $creation_date =  Carbon::now()->format('Y-m-d');
        return    [
             'title'           => $request['title'],
             'description'     => $request['description'],
-            'creation_date'   => $request['creation_date'],
+            'creation_date'   => $creation_date,
             'expiration_date' => $request['expiration_date'],
-            'user_id'         => $request['user_id'],
+            'user_id'         => $user_id,
             'tag_id'          => $request['tag_id'],
         ];
     }
