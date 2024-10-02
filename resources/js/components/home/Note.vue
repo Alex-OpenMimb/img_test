@@ -129,7 +129,7 @@ export default {
 
         });
         const getImageUrl = (imagePath) => {
-            return `http://127.0.0.1:8000/storage/${imagePath}`
+            return `${window.location.origin}/storage/${imagePath}`
         };
 
         return{
