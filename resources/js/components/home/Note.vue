@@ -1,5 +1,32 @@
 <template>
     <div class="container   ">
+        <span class="">Ordenar por fecha</span>
+        <div class="w-50 d-flex gap-4">
+          <div class="">
+              <label>Tipo de fecha*</label>
+              <select v-model="date" class="form-control" >
+                  <option value=""> Seleccionar </option>
+                  <option value="creation_date"> Creacion </option>
+                  <option value="expiration_date"> Expira </option>
+              </select>
+          </div>
+
+           <div>
+               <label>Tipo de rden*</label>
+               <select v-model="order" class="form-control" >
+                   <option value=""> Seleccionar </option>
+                   <option value="asc"> Asendente </option>
+                   <option value="desc"> Desendente </option>
+               </select>
+           </div>
+            <div>
+                <button  @click="orderNote" class="btn btn-primary"> Filtrar</button>
+            </div>
+
+        </div>
+        <div v-if="validation_error" class="error-messages  text-danger" style="height:50px;">
+            {{validation_error }}
+        </div>
 
        <div class="d-flex justify-content-end">
            <button @click="clearInput" type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-note">
@@ -62,7 +89,7 @@
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h4 class="modal-title">Crear Nota</h4>
-                        <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                        <button @click="clearError" type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
                     </div>
 
                     <!-- Modal Body -->
@@ -73,32 +100,38 @@
                                     <div class="form-group">
                                         <label>Titulo</label>
                                         <input v-model="form.title"  class="form-control" placeholder="Titulo" >
+                                        <span class="text-danger" v-if="form_error.title"> {{form_error.title}}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Fecha de expiración</label>
                                         <input v-model="form.expiration_date"  class="form-control" type="date" >
+                                        <span class="text-danger" v-if="form_error.expiration_date"> {{form_error.expiration_date}}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group my-4">
                                 <input v-model="form.description"  class="form-control" type="text" placeholder="Descripción"  >
+                                <span class="text-danger" v-if="form_error.description"> {{form_error.description}}</span>
                             </div>
 
                             <div class="form-group my-4">
                                 <label>Imagen</label>
                                 <input  @change="handleImageUpload"  class="form-control" type="file">
+                                <span class="text-danger" v-if="form_error.image"> {{form_error.image}}</span>
                             </div>
 
                             <div class="form-group d-flex flex-column my-4">
+
                                 <label>Categoría</label>
                                 <select v-model="form.tag_id"  class="form-control" >
                                     <option v-for="(tag, index) in tags" :key="index" :value="tag.id">
                                         {{ tag.name }}
                                     </option>
                                 </select>
+                                <span class="text-danger" v-if="form_error.tag"> {{form_error.tag}}</span>
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-block">Guardar</button>
@@ -126,7 +159,7 @@
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h4 class="modal-title">Editar Nota</h4>
-                        <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                        <button  @click="clearError" type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
                     </div>
 
                     <!-- Modal Body -->
@@ -137,23 +170,27 @@
                                     <div class="form-group">
                                         <label>Titulo</label>
                                         <input v-model="selectedNote.title" class="form-control" >
+                                        <span class="text-danger" v-if="form_error.title"> {{form_error.title}}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Fecha de expiración</label>
                                         <input  v-model="selectedNote.expiration_date" class="form-control" type="date" >
+                                        <span class="text-danger" v-if="form_error.expiration_date"> {{form_error.expiration_date}}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group my-4">
                                 <input  v-model="selectedNote.description"  class="form-control" type="text" placeholder="Descripción"  >
+                                <span class="text-danger" v-if="form_error.description"> {{form_error.description}}</span>
                             </div>
 
                             <div class="form-group my-4">
                                 <label>Imagen</label>
                                 <input  @change="handleImageUploadUpdate"  class="form-control" type="file">
+                                <span class="text-danger" v-if="form_error.image"> {{form_error.image}}</span>
                             </div>
 
                             <div class="form-group d-flex flex-column my-4">
@@ -163,6 +200,7 @@
                                         {{ tag.name }}
                                     </option>
                                 </select>
+                                <span class="text-danger" v-if="form_error.tag"> {{form_error.tag}}</span>
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-block">Guardar</button>
@@ -188,6 +226,7 @@
 <script>
 import { computed, ref, onMounted, reactive, watch } from 'vue'
 import { useStore  } from 'vuex'
+import { validateBlankSpace, validateDate, validateImageFile } from '@/helpers/validator.js'
 export default {
 
     setup(){
@@ -210,15 +249,25 @@ export default {
             tag_id: '',
             tag:'',
         })
+        const order = ref('')
+        const date = ref('')
+        const validation_error = ref('')
+        const form_error = ref({
+            title: '',
+            description: '',
+            expiration_date: '',
+            tag:'',
+            image:'',
+        })
 
         onMounted(() => {
             store.dispatch('fetchTags')
             store.dispatch('fetchNote')
+
         })
 
         const handleImageUpload = (event) => {
             form.image = event.target.files[0]
-
 
         }
 
@@ -227,40 +276,81 @@ export default {
 
         }
 
+
+        //Clear inputs and the error messages
         const clearInput = ()=>{
-            form.title = ''
-            form.description = ''
-            form.expiration_date = ''
-            form.tag_id = ''
+            for (let key in form) {
+                form[key] = ''
+            }
             form.image = null
+            for (let key in form_error.value) {
+                form_error.value[key] = ''
+            }
 
         }
 
         const createNote = () => {
 
-            const formData = new FormData()
-            formData.append('title', form.title)
-            formData.append('description', form.description)
-            if( form.expiration_date ) formData.append('expiration_date', form.expiration_date )
-            formData.append('tag_id', form.tag_id)
-            if (form.image) formData.append('image', form.image);
-            store.dispatch('storeNote', formData).then(() => {
-                console.log(errors.value,'test')
-                 if(!errors.value){
-                     store.dispatch('fetchNote')
-                     form.title = ''
-                     form.description = ''
-                     form.expiration_date = ''
-                     form.tag_id = ''
-                     form.image = null
-                     $('#create-note').modal('hide')
-                 }
+            let flag_validator = true
 
+            if(!form.title || !validateBlankSpace( form.title ) ){
+                flag_validator = false;
+                form_error.value.title = 'El titulo es obligatorio';
+            }else{
+                form_error.value.title = '';
+            }
+            if(!form.description || !validateBlankSpace( form.description )){
+                flag_validator = false;
+                form_error.value.description = 'El descripción es obligatoria';
+            }else{
+                form_error.value.description = '';
+            }
+            if( !form.tag_id ){
+                flag_validator = false;
+                form_error.value.tag = 'El categoría es obligatoria';
+            }else{
+                form_error.value.tag = '';
+            }
+            if( form.expiration_date ){
+                if( !validateDate( form.expiration_date ) ){
+                    flag_validator = false;
+                    form_error.value.expiration_date = 'Formato  invalido';
+                }
+            }
+          if( form.image ){
+              if(!validateImageFile(form.image)){
+                  flag_validator = false;
+                  form_error.value.image = 'Formato de archivo invalido';
+              }else{
+                  form_error.value.image = '';
+              }
+          }
 
-            }).catch(error => {
+            if( flag_validator ){
+                //Pass the validations
+                const formData = new FormData()
+                formData.append('title', form.title)
+                formData.append('description', form.description)
+                if( form.expiration_date ) formData.append('expiration_date', form.expiration_date )
+                formData.append('tag_id', form.tag_id)
+                if (form.image) formData.append('image', form.image);
+                store.dispatch('storeNote', formData).then(() => {
+                    console.log(errors.value,'test')
+                    if(!errors.value){
+                        store.dispatch('fetchNote')
+                        form.title = ''
+                        form.description = ''
+                        form.expiration_date = ''
+                        form.tag_id = ''
+                        form.image = null
+                        $('#create-note').modal('hide')
+                    }
+                }).catch(error => {
 
-                console.error(error)
-            })
+                    console.error(error)
+                })
+            }
+
         }
 
         const setNote = (note) =>{
@@ -270,20 +360,59 @@ export default {
         }
 
         const updateNote = (note)=>{
-            const formData = new FormData()
-            formData.append('title', selectedNote.value.title)
-            formData.append('description', selectedNote.value.description)
-            if( selectedNote.value.expiration_date  ) formData.append('expiration_date', selectedNote.value.expiration_date)
-            formData.append('tag_id', selectedNote.value.tag_id)
-            if (selectedNote.value.image) formData.append('image', selectedNote.value.image);
-            store.dispatch('updateNote',  { note, data:formData }).then(() => {
+
+            let flag_validator = true
+
+            if(!selectedNote.value.title || !validateBlankSpace( selectedNote.value.title ) ){
+                flag_validator = false;
+                form_error.value.title = 'El titulo es obligatorio';
+            }else{
+                form_error.value.title = '';
+            }
+            if(!selectedNote.value.description || !validateBlankSpace( selectedNote.value.description )){
+                flag_validator = false;
+                form_error.value.description = 'El descripción es obligatoria';
+            }else{
+                form_error.value.description = '';
+            }
+            if( !selectedNote.value.tag_id ){
+                flag_validator = false;
+                form_error.value.tag = 'El categoría es obligatoria';
+            }else{
+                form_error.value.tag = '';
+            }
+            if( selectedNote.value.expiration_date ){
+                if( !validateDate( selectedNote.value.expiration_date ) ){
+                    flag_validator = false;
+                    form_error.value.expiration_date = 'Formato  invalido';
+                }
+            }
+            if( selectedNote.value.image ){
+                if(!validateImageFile( selectedNote.value.image  )){
+                    flag_validator = false;
+                    form_error.value.image = 'Formato de archivo invalido';
+                }else{
+                    form_error.value.image = '';
+                }
+            }
+            if( flag_validator ){
+                //Pass the validations
+                const formData = new FormData()
+                formData.append('title', selectedNote.value.title)
+                formData.append('description', selectedNote.value.description)
+                if( selectedNote.value.expiration_date  ) formData.append('expiration_date', selectedNote.value.expiration_date)
+                formData.append('tag_id', selectedNote.value.tag_id)
+                if (selectedNote.value.image) formData.append('image', selectedNote.value.image);
+                store.dispatch('updateNote',  { note, data:formData }).then(() => {
                     store.dispatch('fetchNote')
                     $('#edit-note').modal('hide')
 
-            }).catch(error => {
+                }).catch(error => {
 
-                console.error(error)
-            })
+                    console.error(error)
+                })
+            }
+
         }
         const deleteNote = (id) => {
             Swal.fire({
@@ -309,12 +438,28 @@ export default {
             return `${window.location.origin}/storage/${imagePath}`
         }
 
+        const orderNote = () =>{
+            if(!order.value || !date.value) validation_error.value = 'Selecciona un valor valido*.'
+            else{
+                validation_error.value = '';
+                store.dispatch('orderNote',{order:order.value, date:date.value})
+            }
+        }
+
+        const clearError = ()=>{
+            store.dispatch('clearError')
+        }
+
         return{
             tags,
             notes,
             form,
             errors,
             selectedNote,
+            order,
+            date,
+            validation_error,
+            form_error,
             getImageUrl,
             createNote,
             setNote,
@@ -322,7 +467,9 @@ export default {
             handleImageUpload,
             deleteNote,
             clearInput,
-            handleImageUploadUpdate
+            handleImageUploadUpdate,
+            orderNote,
+            clearError,
 
         }
     }

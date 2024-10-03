@@ -21,8 +21,7 @@ const store = createStore({
         },
         SET_ERROR( state, message ){
             state.error = message
-        }
-
+        },
     },
     actions:{
 
@@ -121,7 +120,41 @@ const store = createStore({
             });
         },
         clearError({commit}){
-            commit('SET_ERROR', false);
+            commit('SET_ERROR', null);
+        },
+        orderNote({commit,state},{order,date}){
+            return new Promise((resolve, reject) => {
+                const token = state.token;
+                axios.get(`/api/notes/order`,{
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    params: {
+                        order,
+                        date
+                    }
+                }).then( response =>{
+                    let notes   = response.data.data
+                    if( !response.data.response ) {
+
+                        commit('SET_ERROR','Ha ocurrido un error, verfica si has seleccionado las opciones');
+                    }else{
+                        commit('SET_ERROR',null);
+                        resolve(response)
+                        console.log( notes )
+                        commit('SET_NOTES', notes);
+                    }
+
+                }).catch(error => {
+                    reject(error)
+                    console.error("Error:", error);
+                })
+
+            })
+
+
+
+
         }
 
     },

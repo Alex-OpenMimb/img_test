@@ -29,8 +29,8 @@ class NoteController extends Controller
     public function index()
     {
         try{
-            $note = Note::get();
-            return $this->successResponse( NoteResource::collection( $note ) );
+            $notes = Note::get();
+            return $this->successResponse( NoteResource::collection( $notes ) );
 
         }catch (\Exception $e){
             return $this->errorResponse($e->getMessage(), 409);
@@ -123,6 +123,22 @@ class NoteController extends Controller
         $image_path = NoteService::storeImage($note, $request['image']);
         $note->image = $image_path;
         $note->save();
+    }
+
+
+    /**
+     * Order by creation or expiration date
+     */
+    protected function orderByDate(Request $request)
+    {
+        try {
+            $order = $request->query('order');
+            $date = $request->query('date');
+            $notes = Note::orderBy($date,$order)->get();
+            return $this->successResponse( NoteResource::collection( $notes ) );
+        }catch (\Exception $e){
+            return $this->errorResponse($e->getMessage(), 409);
+        }
     }
 
 }
