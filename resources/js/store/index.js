@@ -93,6 +93,7 @@ const store = createStore({
                 }).then(response => {
                     let message = response.data.message
                     if( !response.data.response ) {
+                        console.log(response)
                         commit('SET_ERROR',message);
                     }else{
                         commit('SET_ERROR',null);
