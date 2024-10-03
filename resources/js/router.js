@@ -3,6 +3,7 @@ import { createWebHistory, createRouter } from 'vue-router';
 import Login from './components/auth/Login.vue'
 import Register from './components/auth/Register.vue'
 import Note from './components/home/Note.vue'
+import store from './store/index.js';
 
 export const routes = [
     {
@@ -38,7 +39,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to,from) =>{
-    if(to.meta.requiresAuth && !localStorage.getItem('token')){
+    if(to.meta.requiresAuth && !localStorage.getItem('token') ){
         return {name: 'login'}
     }
 
