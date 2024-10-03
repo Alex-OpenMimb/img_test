@@ -31,3 +31,7 @@ Sigue los siguientes pasos para configurar el proyecto en tu entorno local:
 3. **Ejecuta las migraciones y seeders para crear las tablas necesarias:**
 
        php artisan migrate:fresh --seed
+4. **Para crear la Nota con el comando ejecutar el comando con las opciones:**
+
+       'app:notes --title= --description= --creation_date= --expiration_date=? --user= --tag=';
+
